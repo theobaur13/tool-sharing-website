@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Messages with <a href="{{ url_for('profile',username=sender.username) }}">{{ sender.username }}</a></h1>
+{% if messages %}                
+    {% for message in messages %}
+        <div class="message">
+            <p><b>{{ message.sent.username }}</b>: {{ message.message }}   {{ message.timestamp.strftime("%x %H:%M") }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No messages</p>
+{% endif %}
+
+<form method="POST" action="">
+
+    {{ form.csrf_token }}
+    {{ form.message.label }} {{ form.message }}<br>
+    {{ form.submit() }}
+
+</form>
+
+{% endblock content %}

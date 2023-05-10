@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<form method="POST" action="" enctype="multipart/form-data">
+
+    {{ form.csrf_token }}
+    {{ form.name.label }} {{ form.name(size=32) }}<br>
+    {{ form.description.label }} {{ form.description(size=32) }}<br>
+    {{ form.deposit.label }} {{ form.deposit }}<br>
+    {{ form.rental_period.label }} {{ form.rental_period }}<br>
+    {{ form.high_risk.label }} {{ form.high_risk }}<br>
+    {{ form.category.label }} {{ form.category }}<br>
+    {{ form.image_path.label }} {{ form.image_path }}<br>
+    {{ form.submit() }}
+
+</form>
+<form action="{{ url_for('listings') }}">
+    <input type="submit" value="Cancel" />
+</form>
+
+{% endblock content %}

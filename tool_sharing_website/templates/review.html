@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Review</h1>
+<form method="POST" action="">
+    {{ form.csrf_token }}
+    {{ form.rating.label }} {{ form.rating }}<br>
+    {{ form.description.label }} {{ form.description }}<br>
+    {{ form.submit() }}
+</form>
+
+{% endblock content %}

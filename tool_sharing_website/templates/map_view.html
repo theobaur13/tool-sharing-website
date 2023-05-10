@@ -1,0 +1,329 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<script src="http://maps.google.com/maps/api/js?key={{ api_key }}" type="text/javascript"></script>
+<h1>Map View</h1>
+<div id="map" style="width: 90%; height: 500px;"></div>
+<style>
+    #map {
+      height: 400px; /* fallback height */
+      max-width: 100%; /* ensure the map container doesn't overflow the viewport */
+      margin: 0 auto; /* center the map container horizontally */
+    }
+    </style>
+<script type="text/javascript">
+var locations = {{ tool_location_data|tojson|safe }};
+
+var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 15,
+    streetViewControl: false,
+    center: new google.maps.LatLng({{ center_point[0] }}, {{ center_point[1] }}),
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    mapTypeControl: false,
+    fullscreenControl: false,
+    styles:[
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#523735"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#c9b2a6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#dcd2be"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#ae9e90"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#93817c"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#a5b076"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#447530"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#fdfcf8"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f8c967"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#e9bc62"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e98d58"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#db8555"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#806b63"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#8f7d77"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#b9d3c2"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#92998d"
+      }
+    ]
+  }
+]
+});
+  
+center_marker = new google.maps.Marker({
+    position: new google.maps.LatLng({{ center_point[0] }}, {{ center_point[1] }}),
+    map: map,
+    icon: 'http://maps.google.com/mapfiles/kml/paddle/red-circle.png' // This is the source for the URL of the image of the center marker
+});
+
+var infowindow = new google.maps.InfoWindow();
+var marker, i;
+
+for (var tool_name in locations) {
+  if (locations.hasOwnProperty(tool_name)) {
+    marker = new google.maps.Marker({
+        position: new google.maps.LatLng(locations[tool_name].coords[0], locations[tool_name].coords[1]),
+        map: map,
+        title: tool_name,
+        id: locations[tool_name].id,
+        owner: locations[tool_name].owner,
+        deposit: locations[tool_name].deposit/100,
+        rental_period: locations[tool_name].rental_period,
+        high_risk: locations[tool_name].high_risk,
+        category: locations[tool_name].category,
+        icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle.png' // This is the source for the URL of the image of the tool markers
+    });
+
+    google.maps.event.addListener(marker, 'click', (function(marker) {
+      return function() {
+        window.location.href = ("{{ url_for('post', post_id=''|int) }}".concat(marker.id));
+      }
+    })
+    (marker));
+
+    google.maps.event.addListener(marker, 'mouseover', (function(marker) {
+      return function() {
+        infowindow.setContent("<h1>"+marker.title+"</h1>"+
+        "<h3>Owner: "+marker.owner+"</h3>"+
+        "<h3>Price: £"+marker.deposit+"</h3>"+
+        "<h3>Rental Period: "+marker.rental_period+" days</h3>"+
+        "<h3>Category: "+marker.category+"</h3>"+
+        "<h3>High Risk: "+marker.high_risk+"</h3>"
+        );
+        infowindow.open(map, marker);
+      }
+    })(marker));
+    
+    google.maps.event.addListener(marker, 'mouseout', (function(marker) {
+      return function() {
+        infowindow.close();
+      }
+    })(marker));
+  }
+}
+
+  </script>
+</br>
+{% endblock content %}

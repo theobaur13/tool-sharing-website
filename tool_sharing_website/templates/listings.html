@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% if orders %}
+    <h2>Manage orders</h2>
+    <table>
+        <tr>
+            <th>Tool</th>
+            <th>Ordered by</th>
+            <th>Rental Start</th>
+            <th>Rental End</th>
+            <th>Completed</th>
+            <!-- <th>Report user</th> -->
+        </tr>
+        {% for order in orders %}
+            <tr>
+                <td><a href="{{ url_for('post', post_id=order.orders_made.id) }}">{{ order.orders_made.name }}</a></td>
+                <td><a href="{{ url_for('profile', username=order.orders_made_by_user.username) }}">{{ order.orders_made_by_user.username }}</a></td>
+                <td>{{ order.rental_start.strftime("%x %H:%M") }}</td>
+                <td>{{ order.rental_end.strftime("%x %H:%M") }}</td>
+                <td>{{ order.is_accepted }}</td>
+                <!-- <td><a href="{{ url_for('report',username=order.orders_made_by_user.username) }}">Report</a></td> -->
+                {% if order.is_accepted == False %}
+                    <td><form method="POST" action="">
+                        <input type="hidden" id="confirm_return" name="confirm_return" value="{{ order.id }}">
+                        {{ form.csrf_token }}
+                        {{ form.submit() }}
+                    </form></td>
+
+                    <!-- Change this later to when order.is_accepted == False and datetime.utcnow() > order.rental_end-->
+                    <td><form 
+                        action="{{ url_for('dispute',order_id=order.id) }}">
+                        <input type="submit" value="Dispute"/>
+                      </form></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+    
+{% else %}
+    <h2>Nobody has made an order for your listings</h2>
+{% endif %}
+
+{% if tools %}
+    <h2>My Listings</h2>
+    <div class="tool-container">
+    {% for tool in tools %}
+        <div class="tool" onclick="window.location.href='{{ url_for('post', post_id=tool.id) }}';">
+            <img src="{{ url_for('static', filename='img/' + tool.image_path) }}" style="width:100%"/>
+
+            <div class="tool-info">
+            <h3><a href="{{ url_for('post',post_id=tool.id) }}">{{ tool.name }}</a></h3>
+            <!-- <p>{{ tool.description }}</p> -->
+            <p>Price: £{{ '{:.2f}'.format(tool.deposit / 100) }}</p>
+            <!-- <p>Location: {{ tool.address }}</p> -->
+            <!-- <p>High risk: {{ tool.high_risk }}</p> -->
+            <p>Rental period: {{ tool.rental_period }}</p>
+            <!-- <p>Category: {{ tool.category }}</p> -->
+            
+            <p><form action="{{ url_for('edit_listing',tool_id=tool.id) }}">
+                <input type="submit" value="Edit Listing" />
+            </form></p>
+            <form method="POST" action="">
+                <input type="hidden" id="remove_listing" name="remove_listing" value="{{ tool.id }}">
+                {{ removeListingForm.csrf_token }}
+                {{ removeListingForm.submit() }}
+            </form>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <h2>You have made no listings</h2>
+{% endif %}
+
+{% endblock content %}

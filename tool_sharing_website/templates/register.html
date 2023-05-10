@@ -1,0 +1,24 @@
+{% extends "layout.html" %} 
+{% block content %}
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'><link rel="stylesheet" href=".static/style.css">
+
+<div class="content-section">
+  <form method="POST" action="">
+    <div class="row">
+      <div class="col-3">
+        <fieldset class="form-group">
+        <h3 class="title">Register</h3>
+          {{ form.csrf_token }} {{ form.username.label }} {{ form.username(size=32)}}
+          {{ form.email.label }} {{ form.email(size=32) }}
+          {{ form.password.label }} {{ form.password(size=32) }}
+          {{ form.confirm_password.label }} {{ form.confirm_password(size=32) }}
+          {{ form.address.label }} {{ form.address(size=32) }}
+          {{ form.remember.label }} {{ form.remember() }}
+          {{ form.submit() }}
+        </fieldset>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock content %}

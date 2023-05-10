@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="profile">
+    {% if current_user %}
+        {% set chat_id = "s" + user.id|string + "r" + current_user.id|string %}
+        <h1>{{ user.username }}</h1>
+        <h4>
+        {% if current_user.is_active and current_user.id != user.id %}
+            <a href="{{ url_for('chat',chat_id=chat_id) }}">Message </a><a href="{{ url_for('report',username=user.username) }}">Report </a>
+        {% endif %}
+        {% if current_user.is_active and current_user.id == user.id %}
+            <a href="{{ onboarding_url }}">Stripe Connect</a>
+            <p>Address: {{ user.address }}
+                <form action="{{ url_for('change_address',user=user.id) }}">
+                    <input type="submit" value="Change"/>
+                </form>
+            </p>
+        {% endif %}
+        </h4>
+    {% endif %}
+
+    <div class="profile-container">
+        <div class="all-tools-container">
+            <h2>Product listings by {{ user.username }}</h2>
+            {% if products %}
+                <div class="tool-container">
+                    {% for tool in products %}
+                    <div class="profile-tool" onclick="window.location.href='{{ url_for('post', post_id=tool.id) }}';">
+                        
+                        <img src="{{ url_for('static', filename='img/' + tool.image_path) }}" style="max-width:100%"/>
+
+                        <div class="tool-info">
+                            <h3><a href="{{ url_for('post',post_id=tool.id) }}">{{ tool.name }}</a></h3>
+                            <!-- <p>{{ tool.description }}</p> -->
+                            <p>Price: £{{ '{:.2f}'.format(tool.deposit / 100) }}</p>
+                            <p><a href="{{ url_for('profile',username=tool.tools_listed.username) }}">Owner: {{ tool.tools_listed.username }}</a></p>
+                            <p class="tool-location">Location: {{ tool.public_address }}</p>
+                            <p>Rental Period: {{tool.rental_period}}</p>
+                            <p>High Risk: {{tool.high_risk}}</p><br>
+                            
+                        </div> 
+                    </div>
+                    {% endfor %}
+                </div>
+                    
+                
+            {% else %}
+                <p>No products</p>
+            {% endif %}
+        </div>
+        <div id="reviews-container">
+            {% if reviews %}
+                <h2>Reviews for {{ user.username }}</h2>
+                <h3>Average review: {{ average }}</h3> <br>
+                {% for review in reviews %}
+                    <fieldset class="col-3">
+                        <h3><a href="{{ url_for('profile',username=review.reviews_left.username) }}">{{ review.reviews_left.username }}</a>: {{ review.rating }}</h3> <!--Once updates made to db username should be review.reviewer.username-->
+                        <!-- <p>{{ review.rating }}</p> -->
+                        <p>{{ review.comments }}</p>
+                    </fieldset>
+                {% endfor %}    
+            {% else %}
+                <p>No reviews</p>
+            {% endif %}
+        </div> 
+    </div>  
+
+</div> 
+
+
+{% endblock content %}

@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% if unhandled_reports %}
+    <h1>Reports</h1>
+    <table>
+        <tr>
+            <th>Reported</th>
+            <th>Reporter</th>
+            <th>Description</th>
+            <th>Handled</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for report in unhandled_reports %}
+            <tr>
+                <td><a href="{{ url_for('profile', username=report.reports_received.username) }}">{{ report.reports_received.username }}</a></td>
+                <td><a href="{{ url_for('profile', username=report.reports_left.username) }}">{{ report.reports_left.username }}</a></td>
+                <td>{{ report.description }}</td>
+                <td>{{ report.handled }}</td>
+                <td>{{ report.timestamp }}</td>
+                <td><form method="POST" action="">
+                    <input type="hidden" id="reported" name="reported" value="{{ report.reported }}">
+                    {{ form.csrf_token }}
+                    {{ form.action.label }} {{ form.action }} 
+                    {{ form.submit() }}
+                </form></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <h1>No reports</h1>
+{% endif %}
+
+{% if unhandled_disputes %}
+<h1>Disputes</h1>
+<table>
+    <tr>
+        <th>Borrower</th>
+        <th>Owner</th>
+        <th>Tool Name</th>
+        <th>Deposit</th>
+        <th>Description</th>
+        <th>Handled</th>
+        <th>Timestamp</th>
+    </tr>
+    {% for dispute in unhandled_disputes %}
+        <tr>
+            <td><a href="{{ url_for('profile', username=dispute.disputed_as_borrower.username) }}">{{ dispute.disputed_as_borrower.username }}</a></td>
+            <td><a href="{{ url_for('profile', username=dispute.disputed_as_owner_.username) }}">{{ dispute.disputed_as_owner_.username }}</a></td>
+            <td><a href="{{ url_for('post', post_id=dispute.disputes_made.id) }}">{{ dispute.disputes_made.name }}</a></td>
+            <td>{{ '{:.2f}'.format(dispute.disputes_made.deposit /100) }}</td>
+            <td>{{ dispute.description }}</td>
+            <td>{{ dispute.handled }}</td>
+            <td>{{ dispute.timestamp }}</td>
+            <td><form method="POST" action="">
+                <input type="hidden" id="disputed" name="disputed" value="{{ dispute.id }}">
+                {{ return_deposit_form.csrf_token }}
+                {{ return_deposit_form.action.label }} {{ return_deposit_form.action }} 
+                {{ return_deposit_form.submit() }}
+            </form></td>
+        </tr>
+    {% endfor %}
+</table>
+{% else %}
+<h1>No disputes</h1>
+{% endif %}
+
+{% if handled_reports %}
+    <h1>Handled Reports</h1>
+    <table>
+        <tr>
+            <th>Reported</th>
+            <th>Reporter</th>
+            <th>Description</th>
+            <th>Handled</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for report in handled_reports %}
+            <tr>
+                <td><a href="{{ url_for('profile', username=report.reports_received.username) }}">{{ report.reports_received.username }}</a></td>
+                <td><a href="{{ url_for('profile', username=report.reports_left.username) }}">{{ report.reports_left.username }}</a></td>
+                <td>{{ report.description }}</td>
+                <td>{{ report.handled }}</td>
+                <td>{{ report.timestamp }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <h1>No handled reports</h1>
+{% endif %}
+
+
+
+{% if handled_disputes %}
+    <h1>Handled Disputes</h1>
+    <table>
+        <tr>
+            <th>Borrower</th>
+            <th>Owner</th>
+            <th>Tool Name</th>
+            <th>Deposit</th>
+            <th>Description</th>
+            <th>Handled</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for dispute in handled_disputes %}
+            <tr>
+                <td><a href="{{ url_for('profile', username=dispute.disputed_as_borrower.username) }}">{{ dispute.disputed_as_borrower.username }}</a></td>
+                <td><a href="{{ url_for('profile', username=dispute.disputed_as_owner_.username) }}">{{ dispute.disputed_as_owner_.username }}</a></td>
+                <td><a href="{{ url_for('post', post_id=dispute.disputes_made.id) }}">{{ dispute.disputes_made.name }}</a></td>
+                <td>{{ '{:.2f}'.format(dispute.disputes_made.deposit /100) }}</td>
+                <td>{{ dispute.description }}</td>
+                <td>{{ dispute.handled }}</td>
+                <td>{{ dispute.timestamp }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <h1>No handled disputes</h1>
+{% endif %}
+
+{% endblock content %}

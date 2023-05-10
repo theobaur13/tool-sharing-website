@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- <h1>Create Listing</h1> -->
+
+<div class="content-section">
+    <form method="POST" action="" enctype="multipart/form-data" id="verify-card-button">
+        <div class="row">
+            <div class="col-3">
+                <fieldset class="form-group">
+                    <h3 class="title">Create Listing</h3>
+                        {{ form.csrf_token }}
+                        {{ form.name.label }} {{ form.name(size=32) }}<br>
+                        {{ form.description.label }} {{ form.description(size=32) }}<br>
+                        {{ form.deposit.label }} {{ form.deposit }}<br>
+                        {{ form.rental_period.label }} {{ form.rental_period }}<br>
+                        {{ form.high_risk.label }} {{ form.high_risk }}<br>
+                        {{ form.category.label }} {{ form.category }}<br>
+                        {{ form.image_path.label }} {{ form.image_path }}<br>
+                        {{ form.submit() }}
+                </fieldset>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const checkout_public_key = '{{checkout_public_key}}';
+const checkout_session_id = '{{checkout_session_id}}';
+</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock content %}

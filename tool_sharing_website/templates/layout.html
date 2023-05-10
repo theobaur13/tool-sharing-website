@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Tool Share</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static',filename='style.css')}}">
+    <!-- custom google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <!-- <div id="navbar">
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('home') }}">Home</a>&nbsp</li>
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('map_view') }}">Map View</a>&nbsp</li>
+                <li><a href="{{ url_for('create_listing') }}">Create Listing</a>&nbsp</li>
+                <li><a href="{{ url_for('show_cart') }}">Show Cart</a>&nbsp</li>
+                <li><a href="{{ url_for('messages') }}">Messages</a>&nbsp</li>
+                <li><a href="{{ url_for('listings') }}">Manage my listings</a>&nbsp</li>
+                <li><a href="{{ url_for('orders') }}">My Orders</a>&nbsp</li>
+                <li><a href="{{ url_for('logout') }}">Logout</a>&nbsp</li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a>&nbsp</li>
+                <li><a href="{{ url_for('register') }}">Register</a>&nbsp</li>
+            {% endif %}
+        </ul>
+    </nav>
+    </div> -->
+
+    <div class="header">
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='img/' + 'tool-share-cardiff-logo-transparent.png') }}" width="150px"></a>
+                </div>
+                <nav>
+                    <ul class="main-navbar">
+                        <li><a href="{{ url_for('home') }}">Home</a>&nbsp</li>
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('map_view') }}">Map View</a>&nbsp</li>
+                            <li><a href="{{ url_for('create_listing') }}">Create Listing</a>&nbsp</li>
+                            <li><a href="{{ url_for('show_cart') }}">Show Cart</a>&nbsp</li>
+                            <li><a href="{{ url_for('messages') }}">Messages</a>&nbsp</li>
+                            <li><a href="{{ url_for('listings') }}">Manage my listings</a>&nbsp</li>
+                            <li><a href="{{ url_for('orders') }}">My Orders</a>&nbsp</li>
+                            <li><a href="{{ url_for('logout') }}">Logout</a>&nbsp</li>
+                        {% else %}
+                            <li><a href="{{ url_for('login') }}">Login</a>&nbsp</li>
+                            <li><a href="{{ url_for('register') }}">Register</a>&nbsp</li>
+                        {% endif %}
+                    </ul>
+                    <!-- <div class="hamburger-menu">
+                        <div class="hamburger"></div>
+                    </div>
+                    <ul class="hamburger-nav">
+                        <li><a href="{{ url_for('home') }}">Home</a>&nbsp</li>
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('map_view') }}">Map View</a>&nbsp</li>
+                            <li><a href="{{ url_for('create_listing') }}">Create Listing</a>&nbsp</li>
+                            <li><a href="{{ url_for('show_cart') }}">Show Cart</a>&nbsp</li>
+                            <li><a href="{{ url_for('messages') }}">Messages</a>&nbsp</li>
+                            <li><a href="{{ url_for('listings') }}">Manage my listings</a>&nbsp</li>
+                            <li><a href="{{ url_for('orders') }}">My Orders</a>&nbsp</li>
+                            <li><a href="{{ url_for('logout') }}">Logout</a>&nbsp</li>
+                        {% else %}
+                            <li><a href="{{ url_for('login') }}">Login</a>&nbsp</li>
+                            <li><a href="{{ url_for('register') }}">Register</a>&nbsp</li>
+                        {% endif %}
+                    </ul> -->
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.querySelector(".hamburger");
+        const hamburgerNav = document.querySelector(".hamburger-nav");
+        const hamburgerMenu = document.querySelector(".hamburger-menu");
+
+        hamburger.addEventListener("click", mobileMenu);
+
+        function mobileMenu() {
+            <!-- hamburger.classList.toggle("show"); -->
+            hamburgerNav.classList.toggle("show");
+        }
+    </script>
+
+    <div id="user-info">
+    {% if current_user.is_authenticated %}
+        <h3>Logged in as: <a href="{{ url_for('profile',username=current_user.username) }}">{{ current_user.username }}</a>
+        <!-- <a href="{{ url_for('profile',username=current_user.username) }}">Profile</a> -->
+            {% if current_user.is_admin %}
+                <a href="{{ url_for('view_reports') }}">View Reports</a>
+            {% endif %}
+        </h3>
+        {% if current_user.is_verified == False %}
+            <p>Account not verified. Please check your email for a verification link. <a href="{{ url_for('resend_email_confirmation') }}">Click here to resend email</a></p>
+        {% endif %}
+    {% endif %}
+    </div>
+    
+    <div id="flashbar">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+            <li class="alert-message {{ category }}">{{ message }} <button onclick="hideFlash()">✖</button></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+        function hideFlash() {
+            document.querySelector(".flashes").style.display = "none";
+        }
+    </script>
+    <script>
+        setTimeout(() => {
+            const flashes = document.querySelector("#flashbar");
+            if (flashes) {
+                /* Add the fade-out class to trigger the CSS transition */
+                flashes.classList.add("fade-out");
+                /* Remove the flashes element from the DOM once the transition is complete */
+                setTimeout(() => {
+                    flashes.remove();
+                }, 1800);
+            }
+        }, 1800);
+    </script>
+    
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- <footer>
+        <p>Tool Share</p>
+        <p>CM2305 Group Project Group 24 &copy; 2023</p>
+    </footer> -->
+
+    <div class="footer">
+        <div class = "container">
+            <div class="row">
+                <div class="footer-col-1">
+                    <h3>App coming soon!</h3>
+                    <p>App available for Android and ios!</p>
+                    <div class="app-logo">
+                        <img src="{{ url_for('static', filename='img/' + 'appstore.jpeg') }}">
+                        <img src="{{ url_for('static', filename='img/' + 'googleplay.jpeg') }}">
+                    </div>
+                </div>
+                <div class="footer-col-2">
+                    <img src="{{ url_for('static', filename='img/' + 'tool-share-cardiff-logo.jpeg') }}">
+                    <p>NeighbourHood Tool Share !</p>
+                </div>
+                <div class ="footer-col-3">
+                    <h3>Useful Links</h3>
+                    <ul>
+                        <li><a href="{{ url_for('about') }}">About Tool Share</a></li>
+                        <li><a href="{{ url_for('termsconditions') }}">Terms & Conditions</a></li>
+                        <li>Coupons</li>
+                        <li>Coupons</li>
+                    </ul>
+                </div>
+                <div class ="footer-col-4">
+                    <h3>Follow us!</h3>
+                    <ul>
+                        <li>Facebook</li>
+                        <li>Instagram</li>
+                        <li>Twitter</li>
+                        <li>Snapchat</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+
+
+</html>

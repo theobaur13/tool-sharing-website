@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Subtotal: £{{ '{:.2f}'.format(total / 100) }}</h2>
+
+{% if total == 0 %}                 <!-- Probably not a very secure validator -->
+    <p>There are no items in your basket</p>
+{% else %}
+    <p>There are {{ tool_count }} items in your basket</p>
+    <form method="POST" action="" class="btn">
+
+        {{ form.csrf_token }}
+        {{ form.submit() }}
+
+    </form>
+{% endif %}
+
+
+{% endblock content %}

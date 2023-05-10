@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Report user: {{ user.username }}</h2>
+
+<form method="POST" action="">
+
+    {{ form.csrf_token }}
+    {{ form.description.label }} {{ form.description }}<br>
+    {{ form.submit() }}
+
+</form>
+
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends "layout.html" %} {% block content %}
+
+<!-- <h1>Home</h1> -->
+<div id="searchform">
+  <form method="POST" action="">
+    {{ form.csrf_token }} {{ form.searchterm.label }} {{ form.searchterm()}}
+    {{ form.searchterm2.label }} {{ form.searchterm2() }}
+    {{ form.submit() }}
+  </form>
+</div>
+
+<!-- <h2>Results:</h2> -->
+
+<div id="filterform">
+  <!-- <div id="filterform"> -->
+    <form method="POST" action="">
+      {{ form2.csrf_token }} {{ form2.select2.label }} 
+      {{ form2.select2() }}
+    </form>
+  <!-- </div> -->
+
+  <div id="radiusform">
+    {% set search = request.args.get("search").split("+") %}
+    {% if search[1] != "" %}
+      <form method="POST" action="">
+        {{ form3.csrf_token }} {{ form3.select3.label }} 
+        {{ form3.select3() }}
+      </form>
+    {% endif %}
+  </div>
+</div>
+<div class="tool-container">
+{% for tool in theTools %}
+<div class="tool" onclick="window.location.href='{{ url_for('post', post_id=tool.id) }}';">
+  <img src="{{ url_for('static', filename='img/' + tool.image_path) }}" style="width:100%"/>
+
+  <div class="tool-info">
+  <h2><a href="{{ url_for('post',post_id=tool.id) }}">{{ tool.name }}</a></h2>
+  <!-- <p>{{ tool.description }}</p> -->
+  <h3>£{{ '{:.2f}'.format(tool.deposit / 100) }}</h3>
+  <p>
+    <a href="{{ url_for('profile',username=tool.tools_listed.username) }}"
+      >Owner: {{ tool.tools_listed.username }}</a
+    >
+  </p>
+  {% if distances %}
+  <p>{{ distances[tool.id] }} miles away</p>
+  {% endif %}
+  <p class="tool-location">Location: {{ tool.public_address }}</p>
+  <p>Rental Period: {{tool.rental_period}}</p>
+  <p>High Risk: {{tool.high_risk}}</p>
+  </div>
+</div>
+{% endfor %}
+</div>
+
+{% endblock content %}

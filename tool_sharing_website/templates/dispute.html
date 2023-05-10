@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% if current_user.id == order.orderer %}
+    <h2>Open dispute with {{ order.orders_received.username }}</h2>
+{% else %}
+    <h2>Open dispute with {{ order.orders_made_by_user.username }}</h2>
+{% endif %}
+
+<form method="POST" action="">
+
+    {{ form.csrf_token }}
+    {{ form.description.label }} {{ form.description }}<br>
+    {{ form.submit() }}
+
+</form>
+
+
+{% endblock content %}

@@ -1,0 +1,368 @@
+{% extends "layout.html" %} {% block content %}
+
+<div style="background-color: white; border: 1px solid grey; padding: 15px; border-radius: 5px;">
+  <div class="post-tool">
+    <h1>{{ tool.name }}</h1>
+    <img src="{{ url_for('static', filename='img/' + tool.image_path) }}" width="500px" />
+    <p>{{ tool.description }}</p>
+    <p>Price: £{{ '{:.2f}'.format(tool.deposit / 100) }}</p>
+    <p>
+      <a href="{{ url_for('profile',username=tool.tools_listed.username) }}"
+        >Owner: {{ tool.tools_listed.username }}</a
+      >
+    </p>
+    <!--Once updates made to db username should be tool.owner.username-->
+
+    <p><b>Note: Location's are not exact for user privacy.</b></p>
+  </div>
+</div>
+  <div id="map" style="width: 600px; height: 450px;"></div>
+  <p>Availability: {{ tool.is_available }}</p>
+  <p>Rental Period: {{tool.rental_period}} days</p>
+  <p>High Risk: {{tool.high_risk}}</p>
+  <p>Category: {{tool.category}}</p>
+  {% if current_user.is_active and current_user.id != tool.owner%} 
+    {% if tool.is_available %}
+      <form action="{{ url_for('show_cart')}}" , method="POST">
+        <input type="hidden" value="{{ tool.id }}" name="add_item" />
+        <input type="submit" value="Add to cart" class="add_to_cart btn" />
+      </form>
+    {% else %}
+      <p>Sorry, this tool is not available</p>
+    {% endif %} 
+  {% endif %} 
+  
+  {% if current_user.id == tool.owner %}
+    <form action="{{ url_for('edit_listing',tool_id=tool.id) }}">
+      <input type="submit" value="Edit Listing" />
+    </form>
+  {% endif %} 
+  {% if current_user.is_admin or current_user.id == tool.owner %}
+    <form method="POST" action="">
+      <input type="hidden" id="tool_id" name="tool_id" value="{{ tool.id }}" />
+      {{ form.csrf_token }} {{ form.submit() }}
+    </form>
+  {% endif %}
+</div>
+<p></p>
+<script src="http://maps.google.com/maps/api/js?key={{ api_key }}" type="text/javascript"></script>
+<script type="text/javascript">
+
+  var coords = {{ street_coords }};
+
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 18,
+    center: new google.maps.LatLng(coords[0], coords[1]),
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    streetViewControl: false,
+    mapTypeControl: false,
+    zoomControl: false,
+    fullscreenControl: false,
+    styles:[
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#523735"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#c9b2a6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#dcd2be"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#ae9e90"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#93817c"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#a5b076"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#447530"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#fdfcf8"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f8c967"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#e9bc62"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e98d58"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#db8555"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#806b63"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#8f7d77"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#b9d3c2"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#92998d"
+      }
+    ]
+  }
+]
+});
+
+var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(coords[0], coords[1]),
+    map: map,
+    icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle.png'
+  });
+
+  // Add border
+  google.maps.event.addListenerOnce(map, 'idle', function () {
+  var bounds = map.getBounds();
+  var northWest = bounds.getNorthEast();
+  var northEast = new google.maps.LatLng(northWest.lat(), bounds.getSouthWest().lng());
+  var southEast = bounds.getSouthWest();
+  var southWest = new google.maps.LatLng(bounds.getSouthWest().lat(), northWest.lng());
+
+  var borderPath = [
+    northWest,
+    northEast,
+    southEast,
+    southWest,
+    northWest
+  ];
+
+  var border = new google.maps.Polyline({
+    path: borderPath,
+    strokeColor: '#000000', // Change border color as needed
+    strokeWeight: 8, // Change border width as needed
+    map: map
+  });
+
+  // Update the border when the map is panned or zoomed
+  google.maps.event.addListener(map, 'bounds_changed', function () {
+    var newBounds = map.getBounds();
+    var newNorthWest = newBounds.getNorthEast();
+    var newNorthEast = new google.maps.LatLng(newNorthWest.lat(), newBounds.getSouthWest().lng());
+    var newSouthEast = newBounds.getSouthWest();
+    var newSouthWest = new google.maps.LatLng(newBounds.getSouthWest().lat(), newNorthWest.lng());
+
+    border.setPath([
+      newNorthWest,
+      newNorthEast,
+      newSouthEast,
+      newSouthWest,
+      newNorthWest
+    ]);
+  });
+});
+
+
+  marker = new google.maps.Marker({
+    position: new google.maps.LatLng(coords[0], coords[1]),
+    map: map,
+    icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle.png'
+  });
+
+
+</script>
+{% endblock content %}

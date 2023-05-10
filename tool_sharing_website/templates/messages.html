@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% if recent_messages %}
+    <h2>Conversations</h2>        
+    {% for message in recent_messages %}
+        <div class="message">
+            <h3>Messages with {{ message.sent.username }}</h3>
+            <!--<p>{{ message.message }}</p>-->
+            <p>Latest message: {{ message.timestamp.strftime("%x %H:%M") }}</p>
+            {% set chat_id = "s" + message.sender|string + "r" + current_user.id|string %}
+            <p><a href="{{ url_for('chat', chat_id=chat_id) }}">View message history</a></p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No messages</p>
+{% endif %}
+
+{% if pending_messages %}
+    <h2>Pending messages</h2>
+    {% for message in pending_messages %}
+        <div class="message">
+            <h3>Message with {{ message.received.username }}</h3>
+            <p>Latest message: {{ message.timestamp.strftime("%x %H:%M") }}</p>
+            {% set chat_id = "s" + message.receiver|string + "r" + current_user.id|string %}
+            <p><a href="{{ url_for('chat', chat_id=chat_id) }}">View message history</a></p>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% endblock content %}

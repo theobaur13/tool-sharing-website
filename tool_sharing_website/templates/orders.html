@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% if active_orders %}
+    <h2>Active orders</h2>
+    <table>
+        <tr>
+            <th>Tool Name</th>
+            <th>Lender</th>
+            <th>Rental Start</th>
+            <th>Rental End</th>
+        </tr>
+        {% for order in active_orders %}
+            <tr>
+                <td><a href="{{ url_for('post', post_id=order.orders_made.id) }}">{{ order.orders_made.name }}</a></td>
+                <td><a href="{{ url_for('profile', username=order.orders_received.username) }}">{{ order.orders_received.username }}</a></td>
+                <td>{{ order.rental_start.strftime("%x %H:%M") }}</td>
+                <td>{{ order.rental_end.strftime("%x %H:%M") }}</td>
+                <td><form 
+                    action="{{ url_for('dispute',order_id=order.id) }}">
+                    <input type="submit" value="Dispute"/>
+                </form></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No active orders</p>
+{% endif %}
+
+{% if completed_orders %}
+    <h2>Completed orders</h2>
+    <table>
+        <tr>
+            <th>Tool Name</th>
+            <th>Lender</th>
+            <th>Rental Start</th>
+            <th>Rental End</th>
+            <th>Leave Review</th>
+        </tr>
+        {% for order in completed_orders %}
+        <tr>
+            <td><a href="{{ url_for('post', post_id=order.orders_made.id) }}">{{ order.orders_made.name }}</a></td>
+            <td><a href="{{ url_for('profile', username=order.orders_received.username) }}">{{ order.orders_received.username }}</a></td>
+            <td>{{ order.rental_start.strftime("%x %H:%M") }}</td>
+            <td>{{ order.rental_end.strftime("%x %H:%M") }}</td>
+            <td><form 
+                action="{{ url_for('review',order_id=order.id) }}">
+                <input type="submit" value="Review"/>
+            </form></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No completed orders</p>
+{% endif %}
+
+
+{% endblock content %}

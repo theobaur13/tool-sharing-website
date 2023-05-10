@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<form method="POST" action="">
+    {{ form.csrf_token }}
+    {{ form.address.label }} {{ form.address(size=32) }}<br>
+    {{ form.submit() }}
+
+</form>
+
+
+{% endblock content %}

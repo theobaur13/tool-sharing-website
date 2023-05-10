@@ -1,0 +1,50 @@
+
+{% extends "layout.html" %} 
+
+{% block content %}
+<div class="homepage-header">
+  <div class="row">
+<h1>Tool Share Cardiff</h1>
+<h2>Find tools near you</h2>
+  </div>
+</div>
+<div id="searchform">
+  <form method="POST" action="">
+    {{ form.csrf_token }} {{ form.searchterm.label }} {{ form.searchterm() }}
+    
+    {{ form.searchterm2.label }} {{ form.searchterm2() }}
+    
+    {{ form.submit() }}
+  </form>
+</div>
+
+<div id="filterform">
+  <form method="POST" action="">
+    {{ filterform.csrf_token }} {{ filterform.select2.label }}
+    {{ filterform.select2() }} 
+  </form>
+</div>
+<div class="tool-container">
+{% for tool in tools %}
+  <div class="tool" onclick="window.location.href='{{ url_for('post', post_id=tool.id) }}';">
+    <img src="{{ url_for('static', filename='img/' + tool.image_path) }}" style="width:100%"/>
+    
+    <div class="tool-info">
+    <h2><a href="{{ url_for('post',post_id=tool.id) }}">{{ tool.name }}</a></h2>
+    <!--<p>{{ tool.description }}</p>-->
+    <h3>£{{ '{:.2f}'.format(tool.deposit / 100) }}</h3>
+    <p>
+      <a href="{{ url_for('profile',username=tool.tools_listed.username) }}"
+        >Owner: {{ tool.tools_listed.username }}</a>
+    </p>
+    {% if distances %}
+    <p>{{ distances[tool.id] }} miles away</p>
+    {% endif %}
+    <p class="tool-location">Location: {{ tool.public_address }}</p>
+    <p>Rental Period: {{tool.rental_period}}</p>
+    <p>High Risk: {{tool.high_risk}}</p>
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock content %}

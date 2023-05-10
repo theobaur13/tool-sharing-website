@@ -1,0 +1,35 @@
+{% extends "layout.html" %} {% block content %}
+
+<h1>Cart</h1>
+{% if tools %}
+  {% for tool in tools %}
+    <div class="tool" onclick="window.location.href='{{ url_for('post', post_id=tool.id) }}';">
+      <img
+        src="{{ url_for('static', filename='img/' + tool.image_path) }}"
+        style="width:100%"
+      />
+      <h2><a href="{{ url_for('post',post_id=tool.id) }}">{{ tool.name }}</a></h2>
+      <p>Price: £{{ '{:.2f}'.format(tool.deposit / 100) }}</p>
+      <p>
+        <a href="{{ url_for('profile',username=tool.owner) }}"
+          >Owner: {{ tool.owner }}</a
+        >
+      </p>
+      <!--Once updates made to db username should be tool.owner.username-->
+      <!--<p>Location: {{ tool.address }}</p>-->
+      <!--<p>Availability: {{ tool.availability }}</p>-->
+      <p>Rental Period: {{tool.rental_period}}</p>
+      <form action="{{ url_for('show_cart')}}" , method="POST">
+        <input type="hidden" value="{{ tool.id }}" name="remove_item" />
+        <input type="submit" value="remove" class="remove" />
+      </form>
+    </div>
+  {% endfor %} 
+
+  <h2>Total: £{{ '{:.2f}'.format(total / 100) }}</h2>
+  <a href="{{ url_for('checkout') }}" class="btn">Checkout</a>
+{% else %}
+  <p>Cart is empty</p>
+{% endif %} 
+
+{% endblock content %}
