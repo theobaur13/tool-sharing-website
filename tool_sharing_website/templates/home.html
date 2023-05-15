@@ -27,7 +27,7 @@
 <div class="tool-container">
 {% for tool in tools %}
   <div class="tool" onclick="window.location.href='{{ url_for('post', post_id=tool.id) }}';">
-    <img src="{{ url_for('static', filename='img/' + tool.image_path) }}" style="width:100%"/>
+    <img src="{{ url_for('static', filename='img/' + tool.image_path) }}" style="width:100%" alt="Image of {{ tool.name }}"/>
     
     <div class="tool-info">
     <h2><a href="{{ url_for('post',post_id=tool.id) }}">{{ tool.name }}</a></h2>
