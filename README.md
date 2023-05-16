@@ -37,8 +37,11 @@ venv\Scripts\activate
 # launches website to localhost
 py wsgi.py
 
-#resets the database with the values in db_maker.py
+# resets the database with the values in db_maker.py
 py db_maker.py
+
+# asks for a tool name, then sets the rental period to 1 hour before current time
+py reset_rental_end.py
 ```
 
 ## Contributing
