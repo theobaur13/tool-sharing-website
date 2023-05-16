@@ -3,6 +3,7 @@ from tool_sharing_website.models import User, Tool, Message, Review, Report, dat
 from tool_sharing_website import stripe
 from tool_sharing_website.maps import findAddress, findCoords, getStreetID
 from tool_sharing_website.routes import request
+import requests
 
 # This file is used to create the database and populate it with some dummy data. It is not used in the actual website, but it is useful for testing purposes.
 
@@ -362,6 +363,13 @@ tools = {
     }
 }
 
+def get_public_ip():
+    try:
+        response = requests.get('https://api.ipify.org?format=json')
+        ip = response.json()['ip']
+        return ip
+    except requests.RequestException:
+        return None
 
 with app.app_context():
     db.drop_all()
@@ -413,7 +421,7 @@ with app.app_context():
             },
             tos_acceptance={
                 "date": int(datetime.now().timestamp()),
-                "ip": "82.10.51.96",
+                "ip": get_public_ip()
             },
             capabilities={
                 "transfers": {"requested": True},
@@ -541,3 +549,4 @@ with app.app_context():
     #     print (tool.name, tool.lat, tool.lng)
 
     # db.session.commit()
+
