@@ -19,7 +19,7 @@
                 <td>{{ report.handled }}</td>
                 <td>{{ report.timestamp }}</td>
                 <td><form method="POST" action="">
-                    <input type="hidden" id="reported" name="reported" value="{{ report.reported }}">
+                    <input type="hidden" id="reported" name="reported" value="{{ report.id }}">
                     {{ form.csrf_token }}
                     {{ form.action.label }} {{ form.action }} 
                     {{ form.submit() }}

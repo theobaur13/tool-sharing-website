@@ -385,8 +385,8 @@ def view_reports():
             unhandled_disputes = Dispute.query.filter_by(handled=False).order_by(Dispute.timestamp.desc()).all()
             handled_disputes = Dispute.query.filter_by(handled=True).order_by(Dispute.timestamp.desc()).all()
             if form.validate_on_submit():
-                user = User.query.filter_by(id=request.form["reported"]).first_or_404()
-                report = Report.query.filter_by(reported=request.form["reported"], handled=False).first_or_404()
+                report = Report.query.filter_by(id=request.form["reported"]).first_or_404()
+                user = User.query.filter_by(id=report.reported).first_or_404()
                 if request.form["action"] == "ban":
                     user.is_banned = True
                     report.handled = True
@@ -398,11 +398,10 @@ def view_reports():
                 db.session.commit()
                 return redirect(url_for("view_reports"))
             if return_deposit_form.validate_on_submit():
-                dispute = Dispute.query.filter_by(id=request.form["disputed"]).first_or_404()
+                dispute = Dispute.query.filter_by(id=request.form["disputed"]).first_or_404()   
                 tool = Tool.query.filter_by(id=dispute.tool).first_or_404()
                 admin = User.query.filter_by(username="admin").first_or_404()
                 order = Order.query.filter_by(tool=dispute.tool, owner=dispute.owner, orderer=dispute.orderer, is_accepted=False).first_or_404()
-                
                 if request.form["action"] == "return_to_owner":
                     user = User.query.filter_by(id=tool.owner).first_or_404()
                     transfer = stripe.Transfer.create(
