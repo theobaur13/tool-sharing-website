@@ -2,10 +2,6 @@ from requests import get
 from keys import api_key
 
 def distance(origin, destination, mode="walking"):
-    #origin = origin.replace(", ", "+")
-    # origin = findAddress(origin)[0]
-    #destination = destination.replace(", ", "+")
-
     url =  f"https://maps.googleapis.com/maps/api/distancematrix/json?origins=address:{origin}&destinations=place_id:{destination}&units=imperial&key={api_key}&mode={mode}"
     request = get(url)
     response = request.json()
@@ -26,15 +22,8 @@ def pureDistance(origin, destination, mode="walking"):  #distace in miles
     return (float((response["rows"][0]["elements"][0]["distance"]["value"])*0.000189394))
 
 def findAddress(address):
-
-    # url = f"https://maps.googleapis.com/maps/api/place/autocomplete/json?input={address}&key={api_key}&types=address" 
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}" 
     request = get(url) # The API Request
-    # response = request.json()["predictions"]
-    # addresses = []
-    # for i in response:
-    #     addresses.append(i["place_id"])
-    # return addresses
 
     response = request.json()["results"]
     if response != []:
@@ -88,6 +77,3 @@ def getAddressName(place_id):
 if __name__ == "__main__":
     address1 = findAddress("4 Warren Cl Rhydyfelin")[0]
     address2 = findAddress("Sengenydd Rd")[0]
-
-    #print(distance(address1, address2, "driving"))
-    #print(pureDistance(address1, address2, "driving"))

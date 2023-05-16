@@ -810,7 +810,6 @@ def termsconditions():
 #def error_404(error):
 #    return "404 Page not Found", 404
 
-
 ## sorting fuction
 def sortResults(theData, current_search, current_searchloc, search_radius):
     deleteTools = []

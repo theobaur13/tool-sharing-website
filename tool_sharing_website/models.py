@@ -1,5 +1,5 @@
 from tool_sharing_website import db, login_manager
-from datetime import datetime, timedelta ## for timestamp not sure if import should be here
+from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -50,7 +50,7 @@ class Tool(db.Model):
     owner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     borrower = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     address = db.Column(db.String(60), nullable=False)
-    deposit = db.Column(db.Integer, nullable=False)     #Make this to decimal
+    deposit = db.Column(db.Integer, nullable=False)
     is_available = db.Column(db.Boolean, nullable=False, default=False)
     high_risk = db.Column(db.Boolean, nullable=False, default=False)
     rental_period = db.Column(db.Integer, nullable=False)
@@ -100,7 +100,6 @@ class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     tool_id = db.Column(db.Integer, nullable=False)
-    is_checked_out = db.Column(db.Boolean, nullable=False, default=False)               #May not need this
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
@@ -130,7 +129,6 @@ class Dispute(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
 #     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 #     payment_method_id = db.Column(db.String(60), nullable=False)
-
 
 @login_manager.user_loader
 def load_user(user_id):

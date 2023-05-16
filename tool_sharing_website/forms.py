@@ -21,44 +21,36 @@ class RegistrationForm(FlaskForm):
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            #flash(f"Username already exists", "danger")
             raise ValidationError('That username is taken. Please choose a different one.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            #flash(f"Email already exists", "danger")
             raise ValidationError('That email is taken. Please choose a different one.')
 
     def validate_password(self, password):
         errors = []
         if password.data.islower():
-            #flash(f"Password must contain at least one uppercase letter", "danger")
-            # raise ValidationError('Password must contain at least one uppercase letter')
             errors.append('Password must contain at least one uppercase letter')
+
         if password.data.isupper():
-            #flash(f"Password must contain at least one lowercase letter", "danger")
-            # raise ValidationError('Password must contain at least one lowercase letter')
             errors.append('Password must contain at least one lowercase letter')
+
         if password.data.isnumeric():
-            #flash(f"Password must contain at least one letter", "danger")
-            # raise ValidationError('Password must contain at least one letter')
             errors.append('Password must contain at least one letter')
+
         if password.data.isalpha():
-            #flash(f"Password must contain at least one number", "danger")
-            # raise ValidationError('Password must contain at least one number')
             errors.append('Password must contain at least one number')
+
         if errors:
             raise ValidationError(", ".join(errors))
         
     def validate_address(self, address):
         if findAddress(address.data)[0] == "":
-            #flash(f"Address not found, try entering more information", "danger")
             raise ValidationError('Address not found, try entering more information')
-        elif getStreetID(findAddress(address.data)[0]) == None:
-            #flash(f"Postcode for this address cannot be found, try entering more information", "danger")
-            raise ValidationError('Postcode for this address cannot be found, try entering more information')
         
+        elif getStreetID(findAddress(address.data)[0]) == None:
+            raise ValidationError('Postcode for this address cannot be found, try entering more information')      
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -110,11 +102,9 @@ class SearchForm(FlaskForm):
     
 class FilterForm(FlaskForm):
     select2 = SelectField('Sort by:', choices=[('none1', 'None'),('pdesc', 'Price (Descending)'), ('pasc', 'Price (Ascending)'), ('rdesc', 'Rental Period (Descending)'), ('rasc', 'Rental Period (Ascending)'), ('ridesc', 'High risk first'), ('riasc', 'Low risk first')], render_kw={"onchange": "this.form.submit()"})
-    #submit2 = SubmitField('Apply')
 
 class DistForm(FlaskForm):
     select3 = SelectField('Within Distance:', choices=[('unlimited', 'Unlimited'), ('0.5', '0.5 Miles'), ('1', '1 Mile'), ('2', '2 Miles'), ('3', '3 Miles'), ('5', '5 Miles'), ('10', '10 Miles'), ('20', '20 Miles'), ('50', '50 Miles'), ('100', '100 Miles')], render_kw={"onchange": "this.form.submit()"})
-    #submit3 = SubmitField('Apply')
 
 class ConfirmForm(FlaskForm):
     submit = SubmitField('Confirm return')
@@ -143,10 +133,8 @@ class ChangeAddressForm(FlaskForm):
 
     def validate_address(self, address):
         if findAddress(address.data) == []:
-            #flash(f"Address not found, try entering more information", "danger")
             raise ValidationError('Address not found, try entering more information')
         elif getStreetID(findAddress(address.data)[0]) == None:
-            #flash(f"Postcode for this address cannot be found, try entering more information", "danger")
             raise ValidationError('Postcode for this address cannot be found, try entering more information')
         
 class ReviewForm(FlaskForm):
