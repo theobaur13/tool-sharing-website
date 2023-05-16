@@ -2,59 +2,486 @@ from tool_sharing_website import db, app
 from tool_sharing_website.models import User, Tool, Message, Review, Report, datetime, CartItem, Order, Dispute
 from tool_sharing_website import stripe
 from tool_sharing_website.maps import findAddress, findCoords, getStreetID
+from tool_sharing_website.routes import request
 
 # This file is used to create the database and populate it with some dummy data. It is not used in the actual website, but it is useful for testing purposes.
+
+users = {
+    "user1": {
+        "username": "user1",
+        "email": "user1@email.com",
+        "password": "password",
+        "address": "4 Blaenclydach Street, CF11 7BB",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "4 Blaenclydach Street",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF11 7BB"
+        }
+    },
+    "user2": {
+        "username": "user2",
+        "email": "user2@email.com",
+        "password": "password",
+        "address": "4 Blaenclydach Street CF11 7BB",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "4 Blaenclydach Street",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF11 7BB"
+        }
+    },
+    "user3": {
+        "username": "user3",
+        "email": "user3@email.com",
+        "password": "password",
+        "address": "12 Blaise Place CF11 6JR",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "12 Blaise Place",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF11 6JR"
+        }
+    },
+    "user4": {
+        "username": "user4",
+        "email": "user4@email.com",
+        "password": "password",
+        "address": "30 Oakfield Road NP20 4LX",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "30 Oakfield Road",
+            "city": "Newport",
+            "country": "GB",
+            "postal_code": "NP20 4LX"
+        }
+    },
+    "user5": {
+        "username": "user5",
+        "email": "user5@email.com",
+        "password": "password",
+        "address": "35 Kincraig Street CF24 3HW",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "35 Kincraig Street",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF24 3HW"
+        }
+    },
+    "user6": {
+        "username": "user6",
+        "email": "user6@email.com",
+        "password": "password",
+        "address": "50 Coburn Street CF24 4BS",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "50 Coburn Street",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF24 4BS"
+        }
+    },
+    "user7": {
+        "username": "user7",
+        "email": "user7@email.com",
+        "password": "password",
+        "address": "40 Australia Rd CF14 3DB",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "40 Australia Rd",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF14 3DB"
+        }
+    },
+    "user8": {
+        "username": "user8",
+        "email": "user8@email.com",
+        "password": "password",
+        "address": "24 Farmleigh CF3 3LE",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "24 Farmleigh",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF3 3LE"
+        }
+    },
+    "user9": {
+        "username": "user9",
+        "email": "user9@email.com",
+        "password": "password",
+        "address": "37 Burnaby St CF24 2JX",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "37 Burnaby St",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF24 2JX"
+        }
+    },
+    "user10": {
+        "username": "user10",
+        "email": "user10@email.com",
+        "password": "password",
+        "address": "36 Daniel St CF24 4NY",
+        "is_verified": True,
+        "is_banned": True,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "36 Daniel St",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF24 4NY"
+        }
+    },
+    "user11": {
+        "username": "user11",
+        "email": "user11@email.com",
+        "password": "password",
+        "address": "1 Woodville Road CF24 4DW",
+        "is_verified": False,
+        "is_banned": False,
+        "is_admin": False,
+        "stripe_address": {
+            "line1": "1 Woodville Road",
+            "city": "Cardiff",
+            "country": "GB",
+            "postal_code": "CF24 4DW"
+        }
+    },
+    "admin": {
+        "username": "admin",
+        "email": "admin@email.com",
+        "password": "password",
+        "address": "10 Downing St SW1A 2AB",
+        "is_verified": True,
+        "is_banned": False,
+        "is_admin": True,
+        "stripe_address": {
+            "line1": "10 Downing St",
+            "city": "London",
+            "country": "GB",
+            "postal_code": "SW1A 2AB"
+        }
+    }
+}
+
+tools = {
+    "rake": {
+        "name": "Rake",
+        "description": "An implement consisting of a pole with a toothed crossbar or fine tines at the end, used especially for drawing together cut grass or smoothing loose soil or gravel.",
+        "owner": 1,
+        "borrower": None,
+        "address": "4 Blaenclydach Street CF11 7BB",
+        "deposit": 1000,
+        "is_available": True,
+        "high_risk": False,
+        "rental_period": 9,
+        "image_path": "rake.jpg",
+        "category": "garden",
+        "stripe_id": "prod_JZ1Z1Z1Z1Z1Z1Z",
+        "public_address": "Blaenclydach St, Cardiff CF11 7BB, UK",
+        "lat": 51.4709412,
+        "lng": -3.1830723
+    },
+    "shovel": {
+        "name": "Shovel",
+        "description": "A shovel is a tool used for digging, lifting, and moving bulk materials, such as soil, coal, gravel, snow, sand, or ore.",
+        "owner": 1,
+        "borrower": None,
+        "address": "4 Blaenclydach Street CF11 7BB",
+        "deposit": 1000,
+        "is_available": True,
+        "high_risk": False,
+        "rental_period": 9,
+        "image_path": "shovel.jpg",
+        "category": "garden",
+        "stripe_id": "prod_JZ2Z2Z2Z2Z2Z2",
+        "public_address": "Blaenclydach St, Cardiff CF11 7BB, UK",
+        "lat": 51.4709412,
+        "lng": -3.1830723
+    },
+    "circular_saw": {
+        "name": "Circular saw",
+        "description": "A circular saw is a power-saw using a toothed or abrasive disc or blade to cut different materials using a rotary motion spinning around an arbor.",
+        "owner": 3,
+        "borrower": None,
+        "address": "12 Blaise Place CF11 6JR",
+        "deposit": 5000,
+        "is_available": True,
+        "high_risk": True,
+        "rental_period": 9,
+        "image_path": "circularsaw.jpg",
+        "category": "garden",
+        "stripe_id": "prod_JZ3Z3Z3Z3Z3Z3",
+        "public_address": "Blaise Place, Cardiff CF11 6JR, UK",
+        "lat": 51.4672159,
+        "lng": -3.1948531
+    },
+    "axe": {
+        "name": "Axe",
+        "description": "An axe is an implement that has been used for millennia to shape, split and cut wood; to harvest timber; as a weapon; and as a ceremonial or heraldic symbol.",
+        "owner": 4,
+        "borrower": None,
+        "address": "30 Oakfield Road NP20 4LX",
+        "deposit": 2350,
+        "is_available": True,
+        "high_risk": True,
+        "rental_period": 5,
+        "image_path": "axe.jpg",
+        "category": "garden",
+        "stripe_id": "prod_JZ6Z6Z6Z6Z6Z6Z",
+        "public_address": "Oakfield Rd, Newport NP20 4LX, UK",
+        "lat": 51.58579169999999,
+        "lng": -3.0101482
+    },
+    "hammer": {
+        "name": "Hammer",
+        "description": "A hammer is a tool or device that delivers a blow to an object.",
+        "owner": 5,
+        "borrower": None,
+        "address": "35 Kincraig Street CF24 3HW",
+        "deposit": 550,
+        "is_available": True,
+        "high_risk": False,
+        "rental_period": 14,
+        "image_path": "hammer.jpg",
+        "category": "garden",
+        "stripe_id": "prod_JZ7Z7Z7Z7Z7Z7Z",
+        "public_address": "Kincraig St, Cardiff CF24 3HW, UK",
+        "lat": 51.4908124,
+        "lng": -3.1688227
+    },
+    "drill": {
+        "name": "Drill",
+        "description": "A drill is a tool fitted with a cutting tool attachment or driving tool attachment, usually a drill bit or driver bit, used for boring holes in various materials or fastening various materials together with the use of fasteners.",
+        "owner": 6,
+        "borrower": None,
+        "address": "50 Coburn Street CF24 4BS",
+        "deposit": 2495,
+        "is_available": True,
+        "high_risk": True,
+        "rental_period": 7,
+        "image_path": "drill.jpg",
+        "category": "garden",
+        "stripe_id": "prod_JZ8Z8Z8Z8Z8Z8Z",
+        "public_address": "Coburn St, Cardiff CF24 4BS, UK",
+        "lat": 51.49035319999999,
+        "lng": -3.1742844
+    },
+    "air_fryer": {
+        "name": "Air Fryer",
+        "description": "An air fryer is a kitchen appliance that uses hot air in combination with high-speed air circulation (rapid hot air) to cook food.",
+        "owner": 7,
+        "borrower": None,
+        "address": "40 Australia Rd CF14 3DB",
+        "deposit": 6750,
+        "is_available": True,
+        "high_risk": False,
+        "rental_period": 10,
+        "image_path": "airfryer.jpg",
+        "category": "kitchen",
+        "stripe_id": "prod_JZ9Z9Z9Z9Z9Z9Z",
+        "public_address": "Australia Rd, Cardiff CF14 3DB, UK",
+        "lat": 51.5014615,
+        "lng": -3.1908934
+    },
+    "blender": {
+        "name": "Blender",
+        "description": "A blender is a kitchen and laboratory appliance used to mix, purée, or emulsify food and other substances.",
+        "owner": 8,
+        "borrower": None,
+        "address": "24 Farmleigh CF3 3LE",
+        "deposit": 1500,
+        "is_available": True,
+        "high_risk": False,
+        "rental_period": 3,
+        "image_path": "blender.jpg",
+        "category": "kitchen",
+        "stripe_id": "prod_JZ10Z10Z10Z10Z10Z",
+        "public_address": "Farmleigh, Cardiff CF3 3LE, UK",
+        "lat": 51.5086927,
+        "lng": -3.1260949
+    },
+        "toaster": {
+        "name": "Toaster",
+        "description": "A toaster is an electric small appliance designed to toast slices of bread by exposing them to radiant heat, thus converting them into a form that is palatable and easier to digest.",
+        "owner": 9,
+        "borrower": None,
+        "address": "37 Burnaby St CF24 2JX",
+        "deposit": 500,
+        "is_available": True,
+        "high_risk": False,
+        "rental_period": 10,
+        "image_path": "toaster.jpg",
+        "category": "kitchen",
+        "stripe_id": "prod_JZ11Z11Z11Z11Z11Z",
+        "public_address": "Burnaby St, Cardiff CF24 2JX, UK",
+        "lat": 51.4836098,
+        "lng": -3.1506508
+    },
+    "kettle": {
+        "name": "Kettle",
+        "description": "A kettle is a type of pot, traditionally made of metal, with a lid, a small spout for pouring, and a handle.",
+        "owner": 10,
+        "borrower": None,
+        "address": "36 Daniel St CF24 4NY",
+        "deposit": 450,
+        "is_available": True,
+        "high_risk": False,
+        "rental_period": 4,
+        "image_path": "kettle.jpg",
+        "category": "kitchen",
+        "stripe_id": "prod_JZ12Z12Z12Z12Z12Z",
+        "public_address": "Daniel St, Cardiff CF24 4NY, UK",
+        "lat": 51.4962241,
+        "lng": -3.1779503
+    }
+}
+
 
 with app.app_context():
     db.drop_all()
     db.create_all()
-    #stripe.Product.delete("prod_JZ1Z1Z1Z1Z1Z1Z")
-    #stripe.Account.delete("acct_1Mr02nCrf3y5ScqE")
-    #stripe.PaymentIntent.create(amount=500, currency="gbp", payment_method="pm_card_visa")
-    # stripe.Account.delete("acct_1MwSAzEOdh3cF1Ym")
-    # stripe.Account.delete("acct_1N3GVPCdNjEo4owV")
-    user1 = User(username="user1", email="user1@email.com", password="password", address="4 Blaenclydach Street, CF11 7BB", is_verified=True, is_banned=False, stripe_customer_id="cus_NS8AWGnHK3xJSh", stripe_connect_id="acct_1Mr4Pu2RevaUSZN6")
-    user2 = User(username="user2", email="user2@email.com", password="password", address="4 Blaenclydach Street CF11 7BB", is_verified=True, is_banned=False, stripe_customer_id="cus_NS8A2D92TqNiOO", stripe_connect_id="acct_1Mr4WcCry81PcqQ0")
-    user3 = User(username="user3", email="user3@email.com", password="password", address="12 Blaise Place CF11 6JR", is_verified=True, is_banned=False, stripe_customer_id="cus_NS8A2PApsxmFVy", stripe_connect_id="acct_1Mr4ZQCWWkQcP8zk")
-    user4 = User(username="user4", email="user4@email.com", password="password", address="30 Oakfield Road NP20 4LX", is_verified=True, is_banned=False, stripe_customer_id="cus_NczpYdsSJcFNpz", stripe_connect_id="acct_1MrjoVCW9MSZoTkp")
-    user5 = User(username="user5", email="user5@email.com", password="password", address="35 Kincraig Street CF24 3HW", is_verified=True, is_banned=False, stripe_customer_id="cus_Nczua4H83i4nmq", stripe_connect_id="acct_1Mrju1E7hJEaRZLN")
-    user6 = User(username="user6", email="user6@email.com", password="password", address="50 Coburn Street CF24 4BS", is_verified=True, is_banned=False, stripe_customer_id="cus_Nd021Bq67mpiK6", stripe_connect_id="acct_1Mrk1CCo6JOwbOtV")
-    user7 = User(username="user7", email="user7@email.com", password="password", address="40 Australia Rd CF14 3DB", is_verified=True, is_banned=False, stripe_customer_id="cus_Nd0CHyncRX177o", stripe_connect_id="acct_1MrkBVCiudPwronf")
-    user8 = User(username="user8", email="user8@email.com", password="password", address="24 Farmleigh CF3 3LE", is_verified=True, is_banned=False, stripe_customer_id="cus_Nd0MLzFYF6J25L", stripe_connect_id="acct_1MrkLAELEIpz5PjO")
-    user9 = User(username="user9", email="user9@email.com", password="password", address="37 Burnaby St CF24 2JX", is_verified=True, is_banned=False, stripe_customer_id="cus_Nd0PiykkdvGZ3S", stripe_connect_id="acct_1MrkNQChl4lsT9ll")
-    user10 = User(username="user10", email="user10@email.com", password="password", address="36 Daniel St CF24 4NY", is_verified=True, is_banned=True, stripe_customer_id="cus_Nd0SMERRfuEkhk", stripe_connect_id="acct_1MrkQWED1vtkXo9r")
-    user11 = User(username="user11", email="user11@email.com", password="password", address="1 Woodville Road CF24 4DW", is_verified=False, is_banned=False, stripe_customer_id="cus_NhrwB6R8CEzWys", stripe_connect_id="acct_1MwSAzEOdh3cF1Ym")
-    admin = User(username="admin", email="admin@email.com", password="password", address="10 Downing St SW1A 2AB", is_verified=True, is_banned=False, is_admin=True, stripe_customer_id="cus_NS8A6jsMx86GAp", stripe_connect_id="acct_1Mr4bLCdRbAxir5W")
 
-    rake = Tool(name="Rake", description="An implement consisting of a pole with a toothed crossbar or fine tines at the end, used especially for drawing together cut grass or smoothing loose soil or gravel.", owner=1, borrower=None, address="4 Blaenclydach Street CF11 7BB", deposit=1000, is_available=True, high_risk=False, rental_period=9, image_path="rake.jpg", category="garden", stripe_id="prod_JZ1Z1Z1Z1Z1Z1Z", public_address="Blaenclydach St, Cardiff CF11 7BB, UK", lat=51.4709412, lng=-3.1830723)
-    shovel = Tool(name="Shovel", description="A shovel is a tool used for digging, lifting, and moving bulk materials, such as soil, coal, gravel, snow, sand, or ore.", owner=1, borrower=None, address="4 Blaenclydach Street CF11 7BB", deposit=1000, is_available=True, high_risk=False, rental_period=9, category="garden", stripe_id="prod_JZ2Z2Z2Z2Z2Z2Z", public_address="Blaenclydach St, Cardiff CF11 7BB, UK", lat=51.4709412, lng=-3.1830723, image_path="shovel.jpg")
-    circular_saw = Tool(name="Circular saw", description="A circular saw is a power-saw using a toothed or abrasive disc or blade to cut different materials using a rotary motion spinning around an arbor.", owner=3, borrower=None, address="12 Blaise Place CF11 6JR", deposit=5000, is_available=True, high_risk=True, rental_period=9, category="garden", stripe_id="prod_JZ3Z3Z3Z3Z3Z3", public_address="Blaise Place, Cardiff CF11 6JR, UK", lat=51.4672159, lng=-3.1948531, image_path="circularsaw.jpg")
+    customer_list = stripe.Customer.list(limit=100)
+    connect_list = stripe.Account.list(limit=100)
+
+    for customer in customer_list:
+        print ("Deleting customer: " + customer.id)
+        stripe.Customer.delete(customer.id)
+    for connect in connect_list:
+        print ("Deleting connect: " + connect.id)
+        stripe.Account.delete(connect.id)
+
+    for user in users:
+        print ("Creating user: " + users[user]["username"])
+        stripe_connect = stripe.Account.create(
+            type="custom",
+            country=users[user]["stripe_address"]["country"],
+            email=users[user]["email"],
+            business_type="individual",
+            individual={
+                "first_name": users[user]["username"],
+                "last_name": users[user]["username"],
+                "email": users[user]["email"],
+                "address" : {
+                    "line1": users[user]["stripe_address"]["line1"],
+                    "city": users[user]["stripe_address"]["city"],
+                    "country": users[user]["stripe_address"]["country"],
+                    "postal_code": users[user]["stripe_address"]["postal_code"]
+                },
+                "phone": "0000000000",
+                "dob": {
+                    "day": 1,
+                    "month": 1,
+                    "year": 1990
+                }
+            },
+            business_profile={
+                "url": "https://theobaur.co.uk/"
+            },
+            external_account={
+                "object": "bank_account",
+                "country": users[user]["stripe_address"]["country"],
+                "currency": "gbp",
+                "routing_number": "108800",
+                "account_number": "GB82WEST12345698765432"
+            },
+            tos_acceptance={
+                "date": int(datetime.now().timestamp()),
+                "ip": "82.10.51.96",
+            },
+            capabilities={
+                "transfers": {"requested": True},
+            },
+            company={
+                "name": users[user]["username"],
+            }
+        )
+        stripe_customer = stripe.Customer.create(
+            email=users[user]["email"],
+            name=users[user]["username"],
+        )
+
+        user = User(
+            username=users[user]["username"],
+            email=users[user]["email"],
+            password=users[user]["password"],
+            address=users[user]["address"],
+            is_verified=users[user]["is_verified"],
+            is_banned=users[user]["is_banned"],
+            is_admin=users[user]["is_admin"],
+            stripe_customer_id=stripe_customer.id,
+            stripe_connect_id=stripe_connect.id
+        )
+        db.session.add(user)
+
     
-    #stripe.Product.create(name="Rake", description="An implement consisting of a pole with a toothed crossbar or fine tines at the end, used especially for drawing together cut grass or smoothing loose soil or gravel.", default_price_data={"currency": "gbp", "unit_amount_decimal": 1000}, id="prod_JZ1Z1Z1Z1Z1Z1Z")
-    #stripe.Product.create(name="Shovel", description="A shovel is a tool used for digging, lifting, and moving bulk materials, such as soil, coal, gravel, snow, sand, or ore.", default_price_data={"currency": "gbp", "unit_amount_decimal": 1000}, id="prod_JZ2Z2Z2Z2Z2Z2Z")
-    #stripe.Product.create(name="Circular saw", description="A circular saw is a power-saw using a toothed or abrasive disc or blade to cut different materials using a rotary motion spinning around an arbor.", default_price_data={"currency": "gbp", "unit_amount_decimal": 5000}, id="prod_JZ3Z3Z3Z3Z3Z3")
+    product_list = stripe.Product.list(active=True, limit=100)
+    for product in product_list:
+        print("Archiving product: " + product.id)
+        product = stripe.Product.retrieve(product.id)
+        product.active = False
+        product.save()
 
-    # rake2 = Tool(name="Pink Rake", description="An implement consisting of a pole with a toothed crossbar or fine tines at the end, used especially for drawing together cut grass or smoothing loose soil or gravel.", owner=1, borrower=None, address="4 Blaenclydach Street, CF11 7BB", deposit=5000, is_available=True, high_risk=True, rental_period=2, image_path="pinkrake.jpg", category="garden", stripe_id="prod_JZ5Z5Z5Z5Z5Z5Z", public_address="Blaenclydach St, Cardiff CF11 7BB, UK")
-    # stripe.Product.create(name="Pink Rake", description="An implement consisting of a pole with a toothed crossbar or fine tines at the end, used especially for drawing together cut grass or smoothing loose soil or gravel.", default_price_data={"currency": "gbp", "unit_amount_decimal": 5000}, id="prod_JZ5Z5Z5Z5Z5Z5Z")
-    axe = Tool(name="Axe", description="An axe is an implement that has been used for millennia to shape, split and cut wood; to harvest timber; as a weapon; and as a ceremonial or heraldic symbol.", owner=4, borrower=None, address="30 Oakfield Road NP20 4LX", deposit=2350, is_available=True, high_risk=True, rental_period=5, category="garden", stripe_id="prod_JZ6Z6Z6Z6Z6Z6Z", public_address="Oakfield Rd, Newport NP20 4LX, UK", lat=51.58579169999999, lng=-3.0101482, image_path="axe.jpg")
-    # stripe.Product.create(name="Axe", description="An axe is an implement that has been used for millennia to shape, split and cut wood; to harvest timber; as a weapon; and as a ceremonial or heraldic symbol.", default_price_data={"currency": "gbp", "unit_amount_decimal": 2350}, id="prod_JZ6Z6Z6Z6Z6Z6Z")
-    hammer = Tool(name="Hammer", description="A hammer is a tool or device that delivers a blow to an object.", owner=5, borrower=None, address="35 Kincraig Street CF24 3HW", deposit=550, is_available=True, high_risk=False, rental_period=14, category="garden", stripe_id="prod_JZ7Z7Z7Z7Z7Z7Z", public_address="Kincraig St, Cardiff CF24 3HW, UK", lat=51.4908124, lng=-3.1688227, image_path="hammer.jpg")
-    # stripe.Product.create(name="Hammer", description="A hammer is a tool or device that delivers a blow to an object.", default_price_data={"currency": "gbp", "unit_amount_decimal": 550}, id="prod_JZ7Z7Z7Z7Z7Z7Z")
-    drill = Tool(name="Drill", description="A drill is a tool fitted with a cutting tool attachment or driving tool attachment, usually a drill bit or driver bit, used for boring holes in various materials or fastening various materials together with the use of fasteners.", owner=6, borrower=None, address="50 Coburn Street CF24 4BS", deposit=2495, is_available=True, high_risk=True, rental_period=7, category="garden", stripe_id="prod_JZ8Z8Z8Z8Z8Z8Z", public_address="Coburn St, Cardiff CF24 4BS, UK", lat=51.49035319999999, lng=-3.1742844, image_path="drill.jpg")
-    # stripe.Product.create(name="Drill", description="A drill is a tool fitted with a cutting tool attachment or driving tool attachment, usually a drill bit or driver bit, used for boring holes in various materials or fastening various materials together with the use of fasteners.", default_price_data={"currency": "gbp", "unit_amount_decimal": 2495}, id="prod_JZ8Z8Z8Z8Z8Z8Z")
-    air_fryer = Tool(name="Air Fryer", description="An air fryer is a kitchen appliance that uses hot air in combination with high-speed air circulation (rapid hot air) to cook food.", owner=7, borrower=None, address="40 Australia Rd CF14 3DB", deposit=6750, is_available=True, high_risk=False, rental_period=10, category="kitchen", stripe_id="prod_JZ9Z9Z9Z9Z9Z9Z", public_address="Australia Rd, Cardiff CF14 3DB, UK", lat=51.5014615, lng=-3.1908934, image_path="airfryer.jpg")
-    # stripe.Product.create(name="Air Fryer", description="An air fryer is a kitchen appliance that uses hot air in combination with high-speed air circulation (rapid hot air) to cook food.", default_price_data={"currency": "gbp", "unit_amount_decimal": 6750}, id="prod_JZ9Z9Z9Z9Z9Z9Z")
-    blender = Tool(name="Blender", description="A blender is a kitchen and laboratory appliance used to mix, purée, or emulsify food and other substances.", owner=8, borrower=None, address="24 Farmleigh CF3 3LE", deposit=1500, is_available=True, high_risk=False, rental_period=3, category="kitchen", stripe_id="prod_JZ10Z10Z10Z10Z10Z", public_address="Farmleigh, Cardiff CF3 3LE, UK", lat=51.5086927, lng=-3.1260949, image_path="blender.jpg")
-    # stripe.Product.create(name="Blender", description="A blender is a kitchen and laboratory appliance used to mix, purée, or emulsify food and other substances.", default_price_data={"currency": "gbp", "unit_amount_decimal": 1500}, id="prod_JZ10Z10Z10Z10Z10Z")
-    toaster = Tool(name="Toaster", description="A toaster is an electric small appliance designed to toast slices of bread by exposing them to radiant heat, thus converting them into a form that is palatable and easier to digest.", owner=9, borrower=None, address="37 Burnaby St CF24 2JX", deposit=500, is_available=True, high_risk=False, rental_period=10, category="kitchen", stripe_id="prod_JZ11Z11Z11Z11Z11Z", public_address="Burnaby St, Cardiff CF24 2JX, UK", lat=51.4836098, lng=-3.1506508, image_path="toaster.jpg")
-    # stripe.Product.create(name="Toaster", description="A toaster is an electric small appliance designed to toast slices of bread by exposing them to radiant heat, thus converting them into a form that is palatable and easier to digest.", default_price_data={"currency": "gbp", "unit_amount_decimal": 500}, id="prod_JZ11Z11Z11Z11Z11Z")
-    kettle = Tool(name="Kettle", description="A kettle is a type of pot, traditionally made of metal, with a lid, a small spout for pouring, and a handle.", owner=10, borrower=None, address="36 Daniel St CF24 4NY", deposit=450, is_available=True, high_risk=False, rental_period=4, category="kitchen", stripe_id="prod_JZ12Z12Z12Z12Z12Z", public_address="Daniel St, Cardiff CF24 4NY, UK", lat=51.4962241, lng=-3.1779503, image_path="kettle.jpg")
-    # stripe.Product.create(name="Kettle", description="A kettle is a type of pot, traditionally made of metal, with a lid, a small spout for pouring, and a handle.", default_price_data={"currency": "gbp", "unit_amount_decimal": 450}, id="prod_JZ12Z12Z12Z12Z12Z")
+    for tool in tools:
+        print("Creating product: " + tools[tool]["name"])
+        product = stripe.Product.create(
+            name=tools[tool]["name"],
+            description=tools[tool]["description"],
+            default_price_data={
+                "currency": "gbp",
+                "unit_amount_decimal": tools[tool]["deposit"]
+            },
+        )
 
+        stripe_id = product.id
+
+        tool = Tool(
+            name=tools[tool]["name"], 
+            description=tools[tool]["description"], 
+            owner=tools[tool]["owner"], 
+            borrower=tools[tool]["borrower"], 
+            address=tools[tool]["address"], 
+            deposit=tools[tool]["deposit"], 
+            is_available=tools[tool]["is_available"], 
+            high_risk=tools[tool]["high_risk"], 
+            rental_period=tools[tool]["rental_period"], 
+            image_path=tools[tool]["image_path"], 
+            category=tools[tool]["category"], 
+            stripe_id=stripe_id,
+            public_address=tools[tool]["public_address"], 
+            lat=tools[tool]["lat"], 
+            lng=tools[tool]["lng"]
+        )
+        db.session.add(tool)
 
     review1 = Review(tool_id=1, reviewer=2, reviewee=1, rating=5, comments="Good")
     review2 = Review(tool_id=1, reviewer=1, reviewee=2, rating=5, comments="Good product, would buy from user2 again")
-    #Auto-generated reviews
     review3 = Review(tool_id=2, reviewer=3, reviewee=1, rating=4, comments="The tool was in good condition")
     review4 = Review(tool_id=2, reviewer=5, reviewee=3, rating=3, comments="The tool was okay, but could have been better")
     review5 = Review(tool_id=3, reviewer=7, reviewee=2, rating=5, comments="Great tool, highly recommend")
@@ -73,7 +500,6 @@ with app.app_context():
     message2 = Message(sender=2, receiver=1, message="Hello, I am good, how are you?", timestamp=datetime(2022, 1, 1, 1, 1, 1))
     message3 = Message(sender=1, receiver=2, message="I am good, thanks for asking", timestamp=datetime(2022, 1, 1, 1, 1, 2))
     message4 = Message(sender=2, receiver=1, message="No problem, I am glad to hear that", timestamp=datetime(2022, 1, 1, 1, 1, 3))
-    #Auto-generated messages
     message5 = Message(sender=1, receiver=5, message="Hi there, I'm interested in borrowing your hammer. When would be a good time for me to come by and pick it up?", timestamp=datetime(2022, 3, 1, 10, 0, 0))
     message6 = Message(sender=5, receiver=1, message="Hi, I'm available tomorrow after 3pm. Does that work for you?", timestamp=datetime(2022, 3, 1, 10, 5, 0))
     message7 = Message(sender=1, receiver=5, message="Yes, that works for me. What's your address?", timestamp=datetime(2022, 3, 1, 10, 10, 0))
@@ -96,9 +522,6 @@ with app.app_context():
     report2 = Report(reporter=2, reported=3, description="Spam in chat", timestamp=datetime(2022, 1, 1, 1, 1, 5), handled=False)
 
     db.session.add_all([
-        user1,user2,user3, user4, user5, user6, user7, user8, user9, user10, user11,
-        admin,
-        rake,shovel,circular_saw,axe,hammer,drill,air_fryer,blender,toaster,kettle,
         review1,review2, review3, review4, review5, review6, review7, review8, review9, review10, review11, review12, review13, review14, review15,
         message1,message2,message3,message4, message5,message6,message7,message8, message9,message10,message11,message12,message13,message14, message15,message16,message17,message18,message19,
         report1,report2,

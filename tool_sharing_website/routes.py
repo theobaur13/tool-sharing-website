@@ -128,7 +128,7 @@ def register():
                 },
             },
             business_profile={
-                "url": "www.toolshare.com",
+                "url": "https://theobaur.co.uk/",
             },
             capabilities={
                 "transfers": {"requested": True},
